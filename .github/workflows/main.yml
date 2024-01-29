@@ -30,6 +30,10 @@ jobs:
     - name: Change to Quarkus project directory
       run: cd quarkus_be
 
+    - name: Grant execute permission for mvnw
+      run: chmod +x mvnw
+      working-directory: ./quarkus_be
+
     - name: Build with Maven
       run: ./mvnw clean install -DskipTests
       working-directory: ./quarkus_be
