@@ -38,3 +38,8 @@ jobs:
       run: ./mvnw clean install
       working-directory: ./quarkus_be
 
+    - name: Upload resulting Build package
+      uses: actions/upload-artifact@v4
+      with:
+        name: Package
+        path: target/
