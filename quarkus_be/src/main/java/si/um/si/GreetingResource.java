@@ -39,10 +39,17 @@ public class GreetingResource {
         narocninaRepository.persist(o1);
 
         Narocnina o2 = new Narocnina();
-        o2.setNaziv("Za broke boys");
+        o2.setNaziv("For broke boys");
         o2.setGigaPodatki(5);
         o2.setTrenutnaPoraba(0);
         o2.setCena("5.00€");
         narocninaRepository.persist(o2);
+
+        Narocnina o3 = new Narocnina();
+        o3.setNaziv("The mid Beast");
+        o3.setGigaPodatki(30);
+        o3.setTrenutnaPoraba(0);
+        o3.setCena("20.00€");
+        narocninaRepository.persist(o3);
     }
 }
