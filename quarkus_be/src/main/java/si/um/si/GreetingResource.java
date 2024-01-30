@@ -1,16 +1,48 @@
 package si.um.si;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
+import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import si.um.si.dao.NarocninaRepository;
+import si.um.si.vao.Narocnina;
 
-@Path("/hello")
+import java.util.logging.Logger;
+
+@ApplicationScoped
 public class GreetingResource {
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Hello from RESTEasy Reactive";
+    private static final Logger log = Logger.getLogger(GreetingResource.class.getName());
+
+    @Inject
+    NarocninaRepository narocninaRepository;
+
+    void onStart(@Observes StartupEvent ev) {
+        log.info("The application is starting...");
+        populateTestDataIfNotPresent();
+    }
+
+    @Transactional
+    void populateTestDataIfNotPresent() {
+        if (narocninaRepository.count() > 0) {
+            log.info("populateTestData - skipped.");
+            return;
+        }
+        log.info("populateTestData initiated.");
+
+        Narocnina o1 = new Narocnina();
+        o1.setNaziv("Najbolj izbrana");
+        o1.setGigaPodatki(100);
+        o1.setTrenutnaPoraba(0);
+        o1.setCena("100.00€");
+        narocninaRepository.persist(o1);
+
+        Narocnina o2 = new Narocnina();
+        o2.setNaziv("Za broke boys");
+        o2.setGigaPodatki(5);
+        o2.setTrenutnaPoraba(0);
+        o2.setCena("5.00€");
+        narocninaRepository.persist(o2);
     }
 }
