@@ -19,6 +19,13 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
 
     - name: Cache Maven packages
       uses: actions/cache@v2
@@ -34,12 +41,15 @@ jobs:
       run: chmod +x mvnw
       working-directory: ./quarkus_be
 
-    - name: Build with Maven
-      run: ./mvnw clean install
+    - name: Build with Maven and Analyze with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Vzupa_zimskaSola24
       working-directory: ./quarkus_be
 
     - name: Upload resulting Build package
       uses: actions/upload-artifact@v4
       with:
         name: Package
-        path: target/
+        path: quarkus_be/target/
