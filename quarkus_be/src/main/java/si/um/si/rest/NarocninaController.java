@@ -11,7 +11,6 @@ import si.um.si.vao.Narocnina;
 
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Path("/narocnine")
 @Produces(MediaType.APPLICATION_JSON)

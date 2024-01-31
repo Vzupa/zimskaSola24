@@ -13,7 +13,7 @@ import static io.smallrye.common.constraint.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
-public class NarocninaTest {
+class NarocninaTest {
 
     @Inject
     NarocninaRepository narocninaRepository;
