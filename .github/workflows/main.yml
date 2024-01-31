@@ -34,18 +34,11 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Change to Quarkus project directory
-      run: cd quarkus_be
-
-    - name: Grant execute permission for mvnw
-      run: chmod +x mvnw
-      working-directory: ./quarkus_be
-
     - name: Build with Maven and Analyze with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Vzupa_zimskaSola24 -Dsonar.qualitygate.wait=false
+      run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Vzupa_zimskaSola24 -Dsonar.qualitygate.wait=false
       working-directory: ./quarkus_be
 
     - name: Upload resulting Build package
@@ -60,16 +53,22 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    - name: Build and Push Backend Docker Image
-      run: |
-        ./mvnw package
-        docker build -f src/main/docker/Dockerfile.jvm -t vzupa/quarkus-be .
-        docker push vzupa/quarkus-be
+    - name: Package Backend Application
+      run: ./mvnw package
       working-directory: ./quarkus_be
-    
-    - name: Build and Push Frontend Docker Image
-      run: |
-        docker build -t vzupa/react-fe .
-        docker push vzupa/react-fe
+
+    - name: Build Backend Docker Image
+      run: docker build -f src/main/docker/Dockerfile.jvm -t vzupa/quarkus-be .
+      working-directory: ./quarkus_be
+
+    - name: Push Backend Docker Image
+      run: docker push vzupa/quarkus-be
+      working-directory: ./quarkus_be
+
+    - name: Build Frontend Docker Image
+      run: docker build -t vzupa/react-fe .
       working-directory: ./ZimskaSola24
 
+    - name: Push Frontend Docker Image
+      run: docker push vzupa/react-fe
+      working-directory: ./ZimskaSola24
