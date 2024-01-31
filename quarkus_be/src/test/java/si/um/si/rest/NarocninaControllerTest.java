@@ -1,9 +1,8 @@
-package si.um.si;
+package si.um.si.rest;
 
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +15,7 @@ import java.util.List;
 
 
 @QuarkusTest
-public class NarocninaControllerTest {
+class NarocninaControllerTest {
 
     @Inject
     NarocninaController narocninaController;
@@ -31,7 +30,7 @@ public class NarocninaControllerTest {
 
     @Test
     @TestTransaction
-    public void testVseOsebeEndpoint() {
+    void testVseOsebeEndpoint() {
         NarocninaDTO newOseba = new NarocninaDTO(null, 1, "Testni", 0, "zastojn");
         Response postResponse = narocninaController.postNarocnina(newOseba);
         Assertions.assertEquals(Response.Status.CREATED.getStatusCode(), postResponse.getStatus());
@@ -63,7 +62,7 @@ public class NarocninaControllerTest {
 
     @Test
     @TestTransaction
-    public void testVseOsebe() {
+    void testVseOsebe() {
         // Create a couple of Oseba entities
         narocninaController.postNarocnina(new NarocninaDTO(null, 10, "Testni1", 5, "dva"));
         narocninaController.postNarocnina(new NarocninaDTO(null, 20, "Testni2", 10, "ena"));

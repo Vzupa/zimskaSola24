@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 public class NarocninaController {
 
     private static final Logger log = Logger.getLogger(NarocninaController.class.getName());
+    private static String logNarocnina = "/narocnine/";
+    private static String logNarocninaNi = "Narocnina ni najdena";
+    private static String logNarocninaNi2 = " ;" + logNarocninaNi + "!";
 
     @Inject
     NarocninaRepository narocninaRepository;
@@ -28,7 +31,7 @@ public class NarocninaController {
         return narocninaRepository.listAll()
                 .stream()
                 .map(Narocnina::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @GET
@@ -36,8 +39,8 @@ public class NarocninaController {
     public Response getNarocninaById(@PathParam("id") int id) {
         Narocnina narocnina = narocninaRepository.findById((long) id);
         if (narocnina == null) {
-            log.info(() -> "/narocnine/" + id + " ; Narocnina ni najdena!");
-            return Response.status(Response.Status.NOT_FOUND).entity("Narocnina ni najdena").build();
+            log.info(() -> logNarocnina + id + logNarocninaNi2);
+            return Response.status(Response.Status.NOT_FOUND).entity(logNarocninaNi).build();
         }
         return Response.ok(narocnina.toDTO()).build();
     }
@@ -56,8 +59,8 @@ public class NarocninaController {
     public Response putNarocnina(@PathParam("id") int id, NarocninaDTO dto) {
         Narocnina oseba = narocninaRepository.findById((long) id);
         if (oseba == null) {
-            log.info(() -> "/narocnine/" + id + " ; Narocnina ni najdena!");
-            return Response.status(Response.Status.NOT_FOUND).entity("Narocnina ni najdena").build();
+            log.info(() -> logNarocnina + id + logNarocninaNi2);
+            return Response.status(Response.Status.NOT_FOUND).entity(logNarocninaNi).build();
         }
         oseba.updateFrom(dto);
         narocninaRepository.persist(oseba);
@@ -70,8 +73,8 @@ public class NarocninaController {
     public Response deleteNarocnina(@PathParam("id") int id) {
         Narocnina oseba = narocninaRepository.findById((long) id);
         if (oseba == null) {
-            log.info(() -> "/narocnine/" + id + " ; Narocnina ni najdena!");
-            return Response.status(Response.Status.NOT_FOUND).entity("Narocnina ni najdena").build();
+            log.info(() -> logNarocnina + id + logNarocninaNi2);
+            return Response.status(Response.Status.NOT_FOUND).entity(logNarocninaNi).build();
         }
         narocninaRepository.delete(oseba);
         return Response.ok("Narocnina izbrisana").build();
