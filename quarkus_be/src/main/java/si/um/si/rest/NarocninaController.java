@@ -24,7 +24,7 @@ public class NarocninaController {
     NarocninaRepository narocninaRepository;
 
     @GET
-    public List<NarocninaDTO> vseOsebe() {
+    public List<NarocninaDTO> vseNarocnine() {
         return narocninaRepository.listAll()
                 .stream()
                 .map(Narocnina::toDTO)
