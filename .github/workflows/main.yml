@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Check out repository
       uses: actions/checkout@v3
@@ -19,13 +18,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
-    - name: Cache SonarCloud packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
 
     - name: Cache Maven packages
       uses: actions/cache@v2
@@ -33,23 +25,45 @@ jobs:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
-        
+
     - name: Grant execute permission for mvnw
       run: chmod +x mvnw
       working-directory: ./quarkus_be
-      
-    - name: Build with Maven and Analyze with SonarCloud
+
+    - name: Build Backend with Maven
+      run: ./mvnw package
+      working-directory: ./quarkus_be
+
+  sonarcloud-analysis:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Grant execute permission for mvnw
+      run: chmod +x mvnw
+      working-directory: ./quarkus_be
+
+    - name: Analyze with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Vzupa_zimskaSola24 -Dsonar.qualitygate.wait=false
       working-directory: ./quarkus_be
 
-    - name: Upload resulting Build package
-      uses: actions/upload-artifact@v4
-      with:
-        name: Package
-        path: quarkus_be/target/
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
@@ -57,12 +71,9 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    - name: Package Backend Application
-      run: ./mvnw package
-      working-directory: ./quarkus_be
-
     - name: Build Backend Docker Image
-      run: docker build -f src/main/docker/Dockerfile.jvm -t vzupa/quarkus-be .
+      run: |
+        docker build -f src/main/docker/Dockerfile.jvm -t vzupa/quarkus-be .
       working-directory: ./quarkus_be
 
     - name: Push Backend Docker Image
@@ -70,7 +81,8 @@ jobs:
       working-directory: ./quarkus_be
 
     - name: Build Frontend Docker Image
-      run: docker build -t vzupa/react-fe .
+      run: |
+        docker build -t vzupa/react-fe .
       working-directory: ./ZimskaSola24
 
     - name: Push Frontend Docker Image
