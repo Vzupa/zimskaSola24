@@ -57,3 +57,29 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Vzupa_zimskaSola24 -Dsonar.qualitygate.wait=false
       working-directory: ./quarkus_be
+      
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    needs: [build, sonarcloud-analysis]
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and Push Backend Docker Image
+      run: |
+        cd ./quarkus_be
+        ./mvnw package
+        docker build -f src/main/docker/Dockerfile.jvm -t vzupa/quarkus-be .
+        docker push vzupa/quarkus-be
+
+    - name: Build and Push Frontend Docker Image
+      run: |
+        cd ./zimska24
+        docker build -t vzupa/react-fe .
+        docker push vzupa/react-fe
