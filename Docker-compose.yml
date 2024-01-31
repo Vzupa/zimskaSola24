@@ -1,14 +1,14 @@
 version: '3.8'
 services:
   quarkus-backend:
-    image: quarkus-be
+    image: vzupa/quarkus-be
     ports:
       - "8080:8080"
     networks:
       - my-network
 
   react-frontend:
-    image: react-fe
+    image: vzupa/react-fe
     ports:
       - "3000:80"
     networks:
